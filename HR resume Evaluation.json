@@ -1,0 +1,338 @@
+{
+  "name": "HR resume Evaluation",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {
+          "maxPages": 2
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -176
+      ],
+      "id": "0c059464-417f-4b5b-abcf-1aac009c7475",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/18pUthMEFOCmfZZobOQJmRA4rc8MvAw4VwD96KKmSJrI/edit?usp=drive_link",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pUthMEFOCmfZZobOQJmRA4rc8MvAw4VwD96KKmSJrI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $('Application Form').item.json['Full Name '] }}",
+            "E-mail": "={{ $('Application Form').item.json['Email'] }}",
+            "Expectation": "={{ $('Application Form').item.json.expectation }}",
+            "Linkedin": "={{ $('Application Form').item.json.Linkdin }}",
+            "CV": "={{ $('Application Form').item.json['Resume'][0].filename }}",
+            "AI Rating": "={{ $json.text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "E-mail",
+              "displayName": "E-mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Expectation",
+              "displayName": "Expectation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Rating",
+              "displayName": "AI Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        -192
+      ],
+      "id": "3d7e0fc0-bef1-4757-8ccd-c7c88be8d47b",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GK1CeFZc8SOaeX0p",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "1rn22cd030.gpavani@rnsit.ac.in",
+        "subject": "New Candidate CV Awaiting Review",
+        "emailType": "text",
+        "message": "=Hello HR, \nA new candidate CV has been received. Candidate Name:{{ $('Application Form').item.json['Full Name '] }} \nCandidate Email: {{ $('Application Form').item.json['Email'] }}  LinkedIn: {{ $('Application Form').item.json.Linkdin }}  Expectation: {{ $('Application Form').item.json.expectation }} \nAI Rating: {{ $('AI Analysis & Rating').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        -192
+      ],
+      "id": "3158c63a-8ca9-465d-ba34-4273149f18e1",
+      "name": "Send a message",
+      "webhookId": "d8ca75c3-08cb-4a95-900a-0cf420fc6af7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jnh4GCNCst6TWDsr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        32
+      ],
+      "id": "b7aedd87-bb6a-4609-94e3-731bd1cdbc5c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FYY8xyOAigKrEfTM",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Application for Software Engineer Position",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name "
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "expectation"
+            },
+            {
+              "fieldLabel": "Linkdin"
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -416,
+        -176
+      ],
+      "id": "cffcec4e-9e55-425c-8306-f9ca5248b705",
+      "name": "Application Form",
+      "webhookId": "f2068ca4-efde-4b4f-bc64-b2dde0f8de44"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rule 1 : Do not exceed maximum of 75 words.\n\nAs an AI with advanced capabilities in talent acquisition and human resources, your task is to conduct a thorough analysis of a candidate's resume against a Software Engineer job description.\n\nProvide:\n1. Compatibility Rating (1-10)\n2. Recommendation for interview\n\nResume:\n{{ $json.text }}\n\nNo markdown.",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "={{ $json.text }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "161231c3-b99e-4d2a-a0b3-682a4e0703db",
+      "name": "AI Analysis & Rating"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $node[\"Send a message\"].json[\"id\"] }}",
+        "emailType": "text",
+        "message": "=Dear {{ $('Application Form').item.json['Full Name '] }},  \nThank you for submitting your CV. Our recruitment team will review your profile shortly. \nBest Regards, \nHR Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "e4f3dfba-8424-4567-a17a-5e339f47fdfa",
+      "name": "Reply to a message",
+      "webhookId": "855ef64d-ffe0-4670-a421-a4459272e754",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jnh4GCNCst6TWDsr",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis & Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Analysis & Rating",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Form": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analysis & Rating": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d356d52c-cb75-4b73-a1e1-0be7645254fd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e65115f38281e15ada3d71484713ef0f1373c59b13066d29b63864a2dda5fbb0"
+  },
+  "id": "PKv8gsIuZVmyyoJ0",
+  "tags": []
+}
